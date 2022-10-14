@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS User (id CHAR(128) primary key NOT NULL,email CHAR(128));
+
+CREATE TABLE IF NOT EXISTS Rsvp (event_id CHAR(128) NOT NULL,user_id CHAR(128));
+
+CREATE TABLE IF NOT EXISTS Event (id CHAR(128) primary key NOT NULL,owner_id CHAR(128), name CHAR(128));
