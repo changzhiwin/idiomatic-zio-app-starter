@@ -8,14 +8,18 @@ import zio.http._
 import idiomatic.db.QuillContext
 import idiomatic.db.table.{Users, UsersLive, Events, EventsLive, Rsvps, RsvpsLive, NotificationsLive}
 import idiomatic.service.common._
-import idiomatic.http._ //{UserRoute, UserRouteLive}
+import idiomatic.http._
 
 object MainApp extends ZIOAppDefault {
 
-  val http = UserRoute.routes ++ EventRoute.routes ++ RsvpRoute.routes
+  val httpApp = for {
+    user <- UserPartial.routes
+    http = Http.collectZIO[Request] { user }
+    _    <- Server.serve(http)
+  } yield ()
+    // UserRoute.routes ++ EventRoute.routes ++ RsvpRoute.routes
 
-  override def run = 
-    Server.serve(http)
+  override def run = httpApp  //Server.serve(http)
       .provide(
         Server.default,
         QuillContext.dataSourceLayer,
@@ -29,6 +33,7 @@ object MainApp extends ZIOAppDefault {
         UserRouteLive.layer,
         RsvpRouteLive.layer,
         EventRouteLive.layer,
+        UserPartialLive.layer,
       )
       //.exitCode // Not use this, will drop errors
 
