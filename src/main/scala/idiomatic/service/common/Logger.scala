@@ -18,6 +18,7 @@ final case class FileLogger(queue: Queue[String]) extends Logger {
 
 object FileLogger {
 
+  //TODO: return ZIO?
   def make(config: FileLoggerConfig): ZIO[Scope, Throwable, FileLogger] = {
     for {
       queue      <- Queue.unbounded[String]
