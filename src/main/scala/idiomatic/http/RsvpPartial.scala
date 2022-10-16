@@ -9,17 +9,18 @@ import zio.json._
 
 import idiomatic.db.table.Rsvps
 
-trait RsvpRoute {
-  def routes: HttpApp[Any, Throwable]
+trait RsvpPartial {
+  def routes: PartialFunction[Request, Task[Response]]
 }
 
-object RsvpRoute {
-  def routes = Http.fromZIO( ZIO.serviceWith[RsvpRoute](_.routes) ).flatten
+object RsvpPartial {
+  def routes: ZIO[RsvpPartial, Nothing, PartialFunction[Request, Task[Response]]] = 
+    ZIO.serviceWith[RsvpPartial](_.routes)
 }
 
-case class RsvpRouteLive(rsvps: Rsvps) extends RsvpRoute {
+case class RsvpPartialLive(rsvps: Rsvps) extends RsvpPartial {
 
-  override val routes: HttpApp[Any, Throwable] = Http.collectZIO[Request] {
+  override val routes: PartialFunction[Request, Task[Response]] = {
 
     case Method.GET -> !! / "rsvps" / eventId =>
       for {
@@ -35,8 +36,8 @@ case class RsvpRouteLive(rsvps: Rsvps) extends RsvpRoute {
   }
 }
 
-object RsvpRouteLive {
-  val layer = ZLayer.fromFunction(RsvpRouteLive.apply _)
+object RsvpPartialLive {
+  val layer = ZLayer.fromFunction(RsvpPartialLive.apply _)
 }
 
 final case class CreateRsvp(userId: UUID, eventId: UUID)

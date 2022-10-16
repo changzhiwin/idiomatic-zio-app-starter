@@ -34,7 +34,7 @@ case class UserPartialLive(users: Users) extends UserPartial {
     case req @ Method.POST -> !! / "users" =>
       for {
         body       <- req.body.asString
-        createUser <- ZIO.fromEither(body.fromJson[CreateUser0].left.map(new Error(_)))
+        createUser <- ZIO.fromEither(body.fromJson[CreateUser].left.map(new Error(_)))
         user       <- users.create(createUser.email)
       } yield Response.json(user.toJson)
   }
@@ -46,8 +46,8 @@ object UserPartialLive {
 
 // AIP Models, only process input value
 
-final case class CreateUser0(email: String)
+final case class CreateUser(email: String)
 
-object CreateUser0 {
-  implicit val codec: JsonCodec[CreateUser0] = DeriveJsonCodec.gen
+object CreateUser {
+  implicit val codec: JsonCodec[CreateUser] = DeriveJsonCodec.gen
 }

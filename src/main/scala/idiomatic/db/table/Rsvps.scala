@@ -8,6 +8,7 @@ import zio._
 import idiomatic.db.QuillContext
 import idiomatic.db.model.Rsvp
 import idiomatic.service.common._
+import idiomatic.service.business.Notifications
 
 trait Rsvps {
   def allForEvent(eventId: UUID): Task[List[Rsvp]]
@@ -57,32 +58,4 @@ final case class RsvpsLive(
 object RsvpsLive {
 
   val layer = ZLayer.fromFunction(RsvpsLive.apply _)
-}
-
-trait Notifications {
-  def notifyOwner(rsvp: Rsvp): Task[Unit]
-}
-
-final case class NotificationsLive(
-  events: Events,
-  users: Users,
-  analytics: Analytics,
-  emailService: EmailService
-) extends Notifications {
-  override def notifyOwner(rsvp: Rsvp): Task[Unit] =
-    for {
-      _        <- analytics.emit("Cool", "Beans")
-      event    <- events.get(rsvp.eventId).someOrFailException
-      attendee <- users.get(rsvp.userId).someOrFailException
-      owner    <- users.get(event.ownerId).someOrFailException
-      _ <- emailService.send(
-             s"${attendee.email} has RSVP'd for ${event.name}",
-             owner.email
-           )
-    } yield ()
-}
-
-object NotificationsLive {
-  val layer =
-    ZLayer.fromFunction(NotificationsLive.apply _)
 }
