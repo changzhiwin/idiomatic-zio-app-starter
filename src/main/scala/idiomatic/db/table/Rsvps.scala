@@ -4,6 +4,8 @@ import java.util.UUID
 import javax.sql.DataSource
 
 import zio._
+import io.getquill.context.qzio.ImplicitSyntax._
+//import io.getquill.context.qzio.ImplicitSyntax.Implicit
 
 import idiomatic.db.QuillContext
 import idiomatic.db.model.Rsvp
@@ -30,18 +32,17 @@ final case class RsvpsLive(
 ) extends Rsvps {
 
   import QuillContext._
+  implicit val env = Implicit(dataSource)
 
   def allForEvent(eventId: UUID): Task[List[Rsvp]] = for {
     _     <- logger.log(s"Fetching all RSVPs for event $eventId")
-    rsvps <- run(query[Rsvp].filter(_.eventId == lift(eventId)))
-               .provideEnvironment(ZEnvironment(dataSource))
+    rsvps <- run(query[Rsvp].filter(_.eventId == lift(eventId))).implicitly
   } yield rsvps
 
   def create(eventId: UUID, userId: UUID): Task[Rsvp] = for {
     _   <- logger.log(s"Creating RSVP for event $eventId with user $userId")
     rsvp = Rsvp(eventId, userId)
-    _   <- run(query[Rsvp].insertValue(lift(rsvp)))
-             .provideEnvironment(ZEnvironment(dataSource))
+    _   <- run(query[Rsvp].insertValue(lift(rsvp))).implicitly
     _   <- notifications.notifyOwner(rsvp)
   } yield rsvp
 
@@ -51,7 +52,7 @@ final case class RsvpsLive(
            query[Rsvp]
              .filter(rsvp => rsvp.eventId == lift(eventId) && rsvp.userId == lift(userId))
              .delete
-         ).provideEnvironment(ZEnvironment(dataSource))
+         ).implicitly
   } yield ()
 }
 

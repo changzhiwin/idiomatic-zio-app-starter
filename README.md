@@ -35,6 +35,13 @@ There are two different way to define routes:
 - Http ++ Http, eg. `EventRoute`
 - ParticalFunction#orElse, like `UserPartial` and `RsvpPartial`
 
+## Quill compile log
+```
+sbt -Dquill.macro.log.pretty=true
+
+sbt -Dquill.macro.log=false
+```
+
 ## Any idea?
 Please share with us, for free.
 
