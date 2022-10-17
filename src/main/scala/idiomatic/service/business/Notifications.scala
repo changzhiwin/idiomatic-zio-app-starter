@@ -3,6 +3,7 @@ package idiomatic.service.business
 
 import zio._
 
+import idiomatic.db.model.Rsvp
 import idiomatic.db.table._
 import idiomatic.service.common._
 

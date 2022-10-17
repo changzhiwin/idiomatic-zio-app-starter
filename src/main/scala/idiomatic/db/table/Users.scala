@@ -27,8 +27,13 @@ final case class UsersLive(
   
   import QuillContext._
 
+  // quoting is implicit when writing a query in a run statement
   override def get(id: UUID): Task[Option[User]] = 
-    run(query[User].filter(_.id == lift(id)))
+    run(
+        quote {
+          query[User].filter(_.id == lift(id))
+        }
+      )
       .map(_.headOption)
       .provideEnvironment(ZEnvironment(dataSource))
 

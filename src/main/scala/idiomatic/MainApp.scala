@@ -6,8 +6,9 @@ import zio._
 import zio.http._
 
 import idiomatic.db.QuillContext
-import idiomatic.db.table.{Users, UsersLive, Events, EventsLive, Rsvps, RsvpsLive, NotificationsLive}
+import idiomatic.db.table.{Users, UsersLive, Events, EventsLive, Rsvps, RsvpsLive}
 import idiomatic.service.common._
+import idiomatic.service.business.{NotificationsLive}
 import idiomatic.http._
 
 object MainApp extends ZIOAppDefault {
