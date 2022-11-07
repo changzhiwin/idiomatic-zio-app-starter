@@ -2,6 +2,8 @@ package idiomatic
 
 import java.nio.file.{Path, Paths}
 
+import com.typesafe.config.Config
+
 import zio._
 import zio.http._
 
@@ -23,8 +25,11 @@ object MainApp extends ZIOAppDefault {
   } yield ()
 
   override def run = httpApp.provide(
-    Server.default,
+    AppConfig.layer,
+    configurableLayer,
 
+    FileLogger.live,
+    Server.live,
     QuillContext.dataSourceLayer,
     UsersLive.layer,
     EventsLive.layer,
@@ -34,11 +39,18 @@ object MainApp extends ZIOAppDefault {
     AnalyticsLive.layer,
     EmailServiceLive.layer,
 
-    FileLogger.layer(Paths.get("/Users/changzhi/temp/start.log")),
-
     RsvpPartialLive.layer,
     UserPartialLive.layer,
     EventRouteLive.layer,
   )
   //.exitCode // Not use this, will drop errors
+
+  val configurableLayer: ZLayer[Config, Throwable, ServerConfig with FileLoggerConfig] = ZLayer.fromZIOEnvironment {
+    for {
+      config    <- ZIO.service[Config]
+
+      logCfg    = FileLoggerConfig(Paths.get(config.getString("app.logFile")))
+      serverCfg = ServerConfig.default.port(config.getInt("app.bindPort"))
+    } yield ZEnvironment[ServerConfig, FileLoggerConfig](serverCfg, logCfg)
+  }
 }

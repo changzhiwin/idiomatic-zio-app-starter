@@ -1,7 +1,7 @@
 package idiomatic.service.common
 
 import java.io.{BufferedWriter, FileWriter}
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 
 import zio._
 import zio.stream.ZStream
@@ -12,15 +12,28 @@ trait Logger {
 
 final case class FileLoggerConfig(path: Path)
 
+object FileLoggerConfig {
+  val default: FileLoggerConfig = FileLoggerConfig(Paths.get("/Users/changzhi/temp/start.log"))
+
+  val live: ZLayer[Any, Nothing, FileLoggerConfig] = ZLayer.succeed(FileLoggerConfig.default)
+
+  def live(config: FileLoggerConfig): ZLayer[Any, Nothing, FileLoggerConfig] =
+    ZLayer.succeed(config)
+}
+
 final case class FileLogger(queue: Queue[String]) extends Logger {
   override def log(msg: String): UIO[Unit] = queue.offer(msg).unit
 }
 
 object FileLogger {
 
-  //TODO: return ZIO?
-  def make(config: FileLoggerConfig): ZIO[Scope, Throwable, FileLogger] = {
+  def default: ZLayer[Any, Throwable, FileLogger] = {
+    FileLoggerConfig.live >>> live
+  }
+
+  def live: ZLayer[FileLoggerConfig, Throwable, FileLogger] = ZLayer.scoped {
     for {
+      config     <- ZIO.service[FileLoggerConfig]
       queue      <- Queue.unbounded[String]
       fileWriter <- ZIO.fromAutoCloseable(
                       ZIO.attempt(
@@ -39,9 +52,4 @@ object FileLogger {
                       .fork
     } yield FileLogger(queue)
   }
-
-  def layer(path: Path): ZLayer[Any, Throwable, FileLogger] =
-    ZLayer.scoped {
-      make(FileLoggerConfig(path))
-    }
 }
