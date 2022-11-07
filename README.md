@@ -9,6 +9,8 @@ Define a idiomatic struct of `dir` about the beckend App of ZIO.
 
 # Currently idea
 ```
+src/resources
+  - application.conf / .properties
 src/main/scala/your-project
   - db
     - model
@@ -40,6 +42,23 @@ There are two different way to define routes:
 sbt -Dquill.macro.log.pretty=true
 
 sbt -Dquill.macro.log=false
+```
+
+## Config 
+> https://github.com/lightbend/config
+
+Loads the following (first-listed are higher priority)
+- system properties
+- application.conf (all resources on classpath with this name)
+- application.json (all resources on classpath with this name)
+- application.properties (all resources on classpath with this name)
+- reference.conf (all resources on classpath with this name)
+
+## Build application packages
+> https://github.com/sbt/sbt-native-packager
+
+```
+sbt universal:packageBin
 ```
 
 ## Any idea?
