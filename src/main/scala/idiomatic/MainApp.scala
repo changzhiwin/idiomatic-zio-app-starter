@@ -16,6 +16,11 @@ import idiomatic.http._
 object MainApp extends ZIOAppDefault {
 
   val httpApp = for {
+    // Just compare two different config file
+    config <- ZIO.service[Config]
+    _    <- Console.printLine(s"app.upstream.type = ${config.getString("app.upstream.type")}")
+    _    <- Console.printLine(s"app.upstream.url = ${config.getString("app.upstream.url")}")
+
     user <- UserPartial.routes
     rsvp <- RsvpPartial.routes
 

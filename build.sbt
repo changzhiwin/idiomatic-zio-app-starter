@@ -3,6 +3,8 @@ ThisBuild / version          := "1.0.0"
 ThisBuild / organization     := "com.example"
 ThisBuild / organizationName := "example"
 
+maintainer := "changzhiwin@gmail.com"
+
 val zioVersion = "2.0.2"
 val zioHttpVersion = "2.0.0-RC11+50-7870fdce+20220919-2120-SNAPSHOT"
 
