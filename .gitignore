@@ -6,3 +6,4 @@
 project/project/target/config-classes
 project/target
 target
+logs/*.log

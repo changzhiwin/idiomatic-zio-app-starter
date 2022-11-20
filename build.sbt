@@ -5,10 +5,9 @@ ThisBuild / organizationName := "example"
 
 maintainer := "changzhiwin@gmail.com"
 
-val zioVersion = "2.0.3"
+val zioVersion = "2.0.4"
 val zioLoggingVersion = "2.1.3"
-//val zioHttpVersion = "2.0.0-RC11+119-0cd216c3+20221024-1727-SNAPSHOT" // test ok
-val zioHttpVersion = "2.0.0-RC11+159-5abadb95+20221108-1602-SNAPSHOT" //"2.0.0-RC11+50-7870fdce+20220919-2120-SNAPSHOT"
+val zioHttpVersion = "0.0.3" // "2.0.0-RC11+159-5abadb95+20221108-1602-SNAPSHOT"
 
 lazy val root = (project in file("."))
   .enablePlugins(JavaServerAppPackaging)
